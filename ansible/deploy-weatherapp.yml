@@ -1,0 +1,31 @@
+---
+- name: Deploy Dockerized WeatherApp
+  hosts: weatherapp
+  become: true
+
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+
+    - name: Start Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Pull weather-app from Docker Hub
+      command: docker pull lakshmikanth79/weather-app
+
+    - name: Stop existing container (if any)
+      command: docker stop weather-app
+      ignore_errors: true
+
+    - name: Remove old container (if any)
+      command: docker rm weather-app
+      ignore_errors: true
+
+    - name: Run weather-app container
+      command: docker run -d --name weather-app lakshmikanth79/weather-app
