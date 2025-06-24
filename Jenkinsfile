@@ -33,11 +33,11 @@ pipeline {
         stage('Docker Build & Push') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh """
-                        docker build -t $DOCKER_IMAGE .
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                        docker push $DOCKER_IMAGE
-                    """
+                    sh '''#!/bin/bash
+docker build -t $DOCKER_IMAGE .
+echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+docker push $DOCKER_IMAGE
+'''
                 }
             }
         }
@@ -45,9 +45,9 @@ pipeline {
         stage('Deploy with Ansible') {
             steps {
                 sh '''
-                    cd ansible
-                    ansible-playbook -i inventory.ini deploy-weatherapp.yml
-                '''
+cd ansible
+ansible-playbook -i inventory.ini deploy-weatherapp.yml
+'''
             }
         }
     }
