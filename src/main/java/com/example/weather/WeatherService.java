@@ -58,12 +58,12 @@ public class WeatherService {
         }
     }
 
-    // Helper method to extract value after a key
+    
     private String getValue(String json, String key) {
         return getValue(json, key, ",");
     }
 
-    // Overloaded: extract value between key and endChar
+    
     private String getValue(String json, String key, String endChar) {
         try {
             int start = json.indexOf(key);
