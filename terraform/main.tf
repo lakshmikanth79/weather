@@ -1,21 +1,41 @@
-provider "local" {}
-
-resource "local_file" "git_script" {
-  filename = "${path.module}/initialize_repo.sh"
-  content = <<-EOT
-    #!/bin/bash
-    git config --global --add safe.directory ${path.module}/..
-    cd ${path.module}/..
-    git init
-    git add .
-    git commit -m "Initial Terraform-based commit"
-  EOT
-  file_permission = "0755"
-}
-
-resource "null_resource" "run_git_script" {
-  provisioner "local-exec" {
-    command = "${path.module}/initialize_repo.sh"
+terraform {
+  required_providers {
+    null = {
+      source  = "hashicorp/null"
+      version = "~> 3.0"
+    }
   }
-  depends_on = [local_file.git_script]
 }
+
+provider "null" {}
+
+# STEP 1: Initialize Git Repo
+resource "null_resource" "git_initializer" {
+  provisioner "local-exec" {
+    command = <<EOT
+      cd ..
+      if [ ! -d .git ]; then
+        git init
+        git config user.name "Lakshmikanth"
+        git config user.email "lakshmikanth@example.com"
+        echo "# WeatherApp Terraform Init" > README.md
+        git add .
+        git commit -m "Initial Terraform-based commit"
+      fi
+    EOT
+  }
+}
+
+# STEP 2: Build and Run Docker Image
+resource "null_resource" "docker_build_and_run" {
+  depends_on = [null_resource.git_initializer]
+
+  provisioner "local-exec" {
+    command = <<EOT
+      cd ..
+      docker build -t lakshmikanth79/weather-app .
+      docker run -d --rm --name weather-app lakshmikanth79/weather-app || true
+    EOT
+  }
+}
+
