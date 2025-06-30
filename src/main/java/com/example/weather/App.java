@@ -7,10 +7,11 @@ import java.util.Scanner;
 
 public class App {
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Enter city name: ");
-        String city = sc.nextLine();
-
+    	 if (args.length == 0) {
+    	        System.out.println("City name not provided");
+    	        return;
+    	}
+    	 String city = args[0];
         // Use WeatherService from test directory
         WeatherService service = new WeatherService();
         String weather = service.getWeather(city);
